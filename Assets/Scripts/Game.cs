@@ -77,12 +77,15 @@ public class Game : MonoBehaviour
 
     public Transform BlocksRoot;
     public GameObject CubeItem;
-    private const int BLOCK_NUM = 8;//Use 2x number
+    private const int BLOCK_NUM = 4;//Use 2x number
     private int score = 0;
 
     private GameObject[,,] Cubes = new GameObject[BLOCK_NUM, BLOCK_NUM, BLOCK_NUM];
     private MeshRenderer[,,] CubeMeshs = new MeshRenderer[BLOCK_NUM, BLOCK_NUM, BLOCK_NUM];
     private static Vector3 ORIGIN_POS = new Vector3(0, 0, 20);
+
+    //Fruit
+    private BlockPoint FruitBlock;
 
     //Snack [head,...,end]
     private List<BlockPoint> SnackBlock = new List<BlockPoint>();
@@ -92,8 +95,8 @@ public class Game : MonoBehaviour
     private bool IsGameStart = false;
     private bool IsGamePause = false;
 
-    private const float MOVE_TICK = 0.1f;
-    private float MoveTick = 0.1f;
+    public float MOVE_TICK = 0.25f;
+    private float MoveTick = 0;
 
     public float CameraDis = 20f;
     public float CameraMoveRate = 0.1f;
@@ -163,16 +166,21 @@ public class Game : MonoBehaviour
         int random = Random.Range(0, 4);
         NowMoveTo = random == 0 ? MoveTo.X : (random == 1 ? MoveTo.X_ : (random == 2 ? MoveTo.Y : MoveTo.Y_)) ; //excpet Z
 
+        //Reset fruit
+        int randX = Random.Range(0, BLOCK_NUM);
+        int randY = Random.Range(0, BLOCK_NUM);
+        int randZ = Random.Range(1, BLOCK_NUM);
+        FruitBlock = new BlockPoint(randX, randY, randZ);
+        //Reset snack
         SnackBlock.Clear();
         int randomX = Random.Range(0, BLOCK_NUM);
         int randomY = Random.Range(0, BLOCK_NUM);
         int randomZ = 0;
-
         SnackBlock.Add(new BlockPoint(randomX, randomY, randomZ));
-
+        //Reset color
         UpdateColor();
 
-        Debug.Log("Snack begin at:" + randomX + "," + randomY + "," + randomZ + "--Face:" + NowFace + "--Move:" + NowMoveTo);
+        //Debug.Log("Snack begin at:" + randomX + "," + randomY + "," + randomZ + "--Face:" + NowFace + "--Move:" + NowMoveTo);
     }
 
     private void Btn_Start()
@@ -215,7 +223,7 @@ public class Game : MonoBehaviour
         if (IsGameStart && !IsGamePause)
         {
             //Move Control
-            //TODO 
+            MoveControl();
 
             MoveTick -= Time.deltaTime;
             if (MoveTick <= 0)
@@ -226,6 +234,249 @@ public class Game : MonoBehaviour
                 Move(NowMoveTo);
                 //update color
                 UpdateColor();
+            }
+        }
+    }
+
+    private void MoveControl ()
+    {
+        
+        if (Input.GetKeyDown(KeyCode.A))
+        {
+            if (NowFace == Face.Face_0_Y_Z)
+            {
+                if (NowMoveTo == MoveTo.Y)
+                {
+                    NowMoveTo = MoveTo.Z;
+                }
+                else if (NowMoveTo == MoveTo.Y_)
+                {
+                    NowMoveTo = MoveTo.Z_;
+                }
+                else if (NowMoveTo == MoveTo.Z)
+                {
+                    NowMoveTo = MoveTo.Y_;
+                }
+                else if (NowMoveTo == MoveTo.Z_)
+                {
+                    NowMoveTo = MoveTo.Y;
+                }
+            }
+            else if (NowFace == Face.Face_1_Y_Z)
+            {
+                if (NowMoveTo == MoveTo.Y)
+                {
+                    NowMoveTo = MoveTo.Z_;
+                }
+                else if (NowMoveTo == MoveTo.Y_)
+                {
+                    NowMoveTo = MoveTo.Z;
+                }
+                else if (NowMoveTo == MoveTo.Z)
+                {
+                    NowMoveTo = MoveTo.Y;
+                }
+                else if (NowMoveTo == MoveTo.Z_)
+                {
+                    NowMoveTo = MoveTo.Y_;
+                }
+            }
+
+            else if (NowFace == Face.Face_X_0_Z)
+            {
+                if (NowMoveTo == MoveTo.X)
+                {
+                    NowMoveTo = MoveTo.Z_;
+                }
+                else if (NowMoveTo == MoveTo.X_)
+                {
+                    NowMoveTo = MoveTo.Z;
+                }
+                else if (NowMoveTo == MoveTo.Z)
+                {
+                    NowMoveTo = MoveTo.X;
+                }
+                else if (NowMoveTo == MoveTo.Z_)
+                {
+                    NowMoveTo = MoveTo.X_;
+                }
+            }
+            else if (NowFace == Face.Face_X_1_Z)
+            {
+                if (NowMoveTo == MoveTo.X)
+                {
+                    NowMoveTo = MoveTo.Z;
+                }
+                else if (NowMoveTo == MoveTo.X_)
+                {
+                    NowMoveTo = MoveTo.Z_;
+                }
+                else if (NowMoveTo == MoveTo.Z)
+                {
+                    NowMoveTo = MoveTo.X_;
+                }
+                else if (NowMoveTo == MoveTo.Z_)
+                {
+                    NowMoveTo = MoveTo.X;
+                }
+            }
+
+            else if (NowFace == Face.Face_X_Y_0)
+            {
+                if (NowMoveTo == MoveTo.X)
+                {
+                    NowMoveTo = MoveTo.Y;
+                }
+                else if (NowMoveTo == MoveTo.X_)
+                {
+                    NowMoveTo = MoveTo.Y_;
+                }
+                else if (NowMoveTo == MoveTo.Y)
+                {
+                    NowMoveTo = MoveTo.X_;
+                }
+                else if (NowMoveTo == MoveTo.Y_)
+                {
+                    NowMoveTo = MoveTo.X;
+                }
+            }
+            else if (NowFace == Face.Face_X_Y_1)
+            {
+                if (NowMoveTo == MoveTo.X)
+                {
+                    NowMoveTo = MoveTo.Y_;
+                }
+                else if (NowMoveTo == MoveTo.X_)
+                {
+                    NowMoveTo = MoveTo.Y;
+                }
+                else if (NowMoveTo == MoveTo.Y)
+                {
+                    NowMoveTo = MoveTo.X;
+                }
+                else if (NowMoveTo == MoveTo.Y_)
+                {
+                    NowMoveTo = MoveTo.X_;
+                }
+            }
+        }
+        if (Input.GetKeyDown(KeyCode.D))
+        {
+            if (NowFace == Face.Face_0_Y_Z)
+            {
+                if (NowMoveTo == MoveTo.Y)
+                {
+                    NowMoveTo = MoveTo.Z_;
+                }
+                else if (NowMoveTo == MoveTo.Y_)
+                {
+                    NowMoveTo = MoveTo.Z;
+                }
+                else if (NowMoveTo == MoveTo.Z)
+                {
+                    NowMoveTo = MoveTo.Y;
+                }
+                else if (NowMoveTo == MoveTo.Z_)
+                {
+                    NowMoveTo = MoveTo.Y_;
+                }
+            }
+            else if (NowFace == Face.Face_1_Y_Z)
+            {
+                if (NowMoveTo == MoveTo.Y)
+                {
+                    NowMoveTo = MoveTo.Z;
+                }
+                else if (NowMoveTo == MoveTo.Y_)
+                {
+                    NowMoveTo = MoveTo.Z_;
+                }
+                else if (NowMoveTo == MoveTo.Z)
+                {
+                    NowMoveTo = MoveTo.Y_;
+                }
+                else if (NowMoveTo == MoveTo.Z_)
+                {
+                    NowMoveTo = MoveTo.Y;
+                }
+            }
+
+            else if (NowFace == Face.Face_X_0_Z)
+            {
+                if (NowMoveTo == MoveTo.X)
+                {
+                    NowMoveTo = MoveTo.Z;
+                }
+                else if (NowMoveTo == MoveTo.X_)
+                {
+                    NowMoveTo = MoveTo.Z_;
+                }
+                else if (NowMoveTo == MoveTo.Z)
+                {
+                    NowMoveTo = MoveTo.X_;
+                }
+                else if (NowMoveTo == MoveTo.Z_)
+                {
+                    NowMoveTo = MoveTo.X;
+                }
+            }
+            else if (NowFace == Face.Face_X_1_Z)
+            {
+                if (NowMoveTo == MoveTo.X)
+                {
+                    NowMoveTo = MoveTo.Z_;
+                }
+                else if (NowMoveTo == MoveTo.X_)
+                {
+                    NowMoveTo = MoveTo.Z;
+                }
+                else if (NowMoveTo == MoveTo.Z)
+                {
+                    NowMoveTo = MoveTo.X;
+                }
+                else if (NowMoveTo == MoveTo.Z_)
+                {
+                    NowMoveTo = MoveTo.X_;
+                }
+            }
+
+            else if (NowFace == Face.Face_X_Y_0)
+            {
+                if (NowMoveTo == MoveTo.X)
+                {
+                    NowMoveTo = MoveTo.Y_;
+                }
+                else if (NowMoveTo == MoveTo.X_)
+                {
+                    NowMoveTo = MoveTo.Y;
+                }
+                else if (NowMoveTo == MoveTo.Y)
+                {
+                    NowMoveTo = MoveTo.X;
+                }
+                else if (NowMoveTo == MoveTo.Y_)
+                {
+                    NowMoveTo = MoveTo.X_;
+                }
+            }
+            else if (NowFace == Face.Face_X_Y_1)
+            {
+                if (NowMoveTo == MoveTo.X)
+                {
+                    NowMoveTo = MoveTo.Y;
+                }
+                else if (NowMoveTo == MoveTo.X_)
+                {
+                    NowMoveTo = MoveTo.Y_;
+                }
+                else if (NowMoveTo == MoveTo.Y)
+                {
+                    NowMoveTo = MoveTo.X_;
+                }
+                else if (NowMoveTo == MoveTo.Y_)
+                {
+                    NowMoveTo = MoveTo.X;
+                }
             }
         }
     }
@@ -249,7 +500,7 @@ public class Game : MonoBehaviour
             CameraTransform.LookAt(ORIGIN_POS);
             CameraTransform.position = Vector3.Lerp(CameraTransform.position, wantedPos, CameraMoveRate);
 
-            Debug.Log( string.Format("Snake Head:{0}  ORIGIN_POS:{1}  Camera Now:{2}  Wanted:{3}", snakeHeadPos,ORIGIN_POS,CameraTransform.position,wantedPos) );
+            //Debug.Log( string.Format("Snake Head:{0}  ORIGIN_POS:{1}  Camera Now:{2}  Wanted:{3}", snakeHeadPos,ORIGIN_POS,CameraTransform.position,wantedPos) );
         }
     }
 
@@ -663,6 +914,6 @@ public class Game : MonoBehaviour
 
         SnackBlock[0] = newPoint;
 
-        Debug.Log(string.Format("Move:{0}  Head:{1}  Face:{2}", towards, newPoint.ToString(), NowFace));
+        //Debug.Log(string.Format("Move:{0}  Head:{1}  Face:{2}", towards, newPoint.ToString(), NowFace));
     }
 }

@@ -280,13 +280,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 830a37ed59da50f4a814159cbb3adfa7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  camera: {fileID: 0}
+  camera: {fileID: 1297841987}
   startB: {fileID: 418250372}
   pauseB: {fileID: 882763715}
   resetB: {fileID: 112217473}
   scoreT: {fileID: 850731313}
   BlocksRoot: {fileID: 99639643}
   CubeItem: {fileID: 1476419071}
+  MOVE_TICK: 0.25
+  CameraDis: 20
+  CameraMoveRate: 0.1
 --- !u!4 &278400152
 Transform:
   m_ObjectHideFlags: 0
