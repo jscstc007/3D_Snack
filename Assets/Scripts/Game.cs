@@ -56,8 +56,19 @@ public struct BlockPoint
 
 public class Game : MonoBehaviour
 {
-
     public Camera camera;
+    private Transform cameraTransform;
+    private Transform CameraTransform
+    {
+        get
+        {
+            if (null == cameraTransform)
+            {
+                cameraTransform = camera.transform;
+            }
+            return cameraTransform;
+        }
+    }
 
     public Button startB;
     public Button pauseB;
@@ -66,7 +77,7 @@ public class Game : MonoBehaviour
 
     public Transform BlocksRoot;
     public GameObject CubeItem;
-    private const int BLOCK_NUM = 6;
+    private const int BLOCK_NUM = 8;//Use 2x number
     private int score = 0;
 
     private GameObject[,,] Cubes = new GameObject[BLOCK_NUM, BLOCK_NUM, BLOCK_NUM];
@@ -81,8 +92,11 @@ public class Game : MonoBehaviour
     private bool IsGameStart = false;
     private bool IsGamePause = false;
 
-    private const float MOVE_TICK = 0.25f;
-    private float MoveTick = 0.25f;
+    private const float MOVE_TICK = 0.1f;
+    private float MoveTick = 0.1f;
+
+    public float CameraDis = 20f;
+    public float CameraMoveRate = 0.1f;
 
     // Use this for initialization
     void Start()
@@ -145,8 +159,9 @@ public class Game : MonoBehaviour
 
     private void InitSnack()
     {
-        NowFace = Face.Face_X_Y_0;//FORCE
-        NowMoveTo = MoveTo.Y;//excpet Z
+        NowFace = Face.Face_X_Y_0;//FORCE THIS FACE 
+        int random = Random.Range(0, 4);
+        NowMoveTo = random == 0 ? MoveTo.X : (random == 1 ? MoveTo.X_ : (random == 2 ? MoveTo.Y : MoveTo.Y_)) ; //excpet Z
 
         SnackBlock.Clear();
         int randomX = Random.Range(0, BLOCK_NUM);
@@ -199,6 +214,9 @@ public class Game : MonoBehaviour
 
         if (IsGameStart && !IsGamePause)
         {
+            //Move Control
+            //TODO 
+
             MoveTick -= Time.deltaTime;
             if (MoveTick <= 0)
             {
@@ -209,6 +227,29 @@ public class Game : MonoBehaviour
                 //update color
                 UpdateColor();
             }
+        }
+    }
+
+    void LateUpdate()
+    {
+        if (IsGameStart && !IsGamePause)
+        {
+            UpdateCameraPosition();
+        }
+    }
+
+    private void UpdateCameraPosition ()
+    {
+        if (null != camera)
+        {
+            BlockPoint snakeHeadPoint = SnackBlock[0];
+            Vector3 snakeHeadPos = new Vector3(snakeHeadPoint.X - BLOCK_NUM/2,snakeHeadPoint.Y - BLOCK_NUM / 2, snakeHeadPoint.Z - BLOCK_NUM / 2) + ORIGIN_POS;
+            Vector3 wantedPos = ORIGIN_POS + (snakeHeadPos - ORIGIN_POS).normalized * CameraDis;
+
+            CameraTransform.LookAt(ORIGIN_POS);
+            CameraTransform.position = Vector3.Lerp(CameraTransform.position, wantedPos, CameraMoveRate);
+
+            Debug.Log( string.Format("Snake Head:{0}  ORIGIN_POS:{1}  Camera Now:{2}  Wanted:{3}", snakeHeadPos,ORIGIN_POS,CameraTransform.position,wantedPos) );
         }
     }
 
@@ -239,7 +280,7 @@ public class Game : MonoBehaviour
                         {
                             CubeMeshs[i, j, k].material.color = Color.red;
                         }
-                        //wall
+                        //base block
                         else
                         {
                             CubeMeshs[i, j, k].material.color = Color.white;
@@ -623,12 +664,5 @@ public class Game : MonoBehaviour
         SnackBlock[0] = newPoint;
 
         Debug.Log(string.Format("Move:{0}  Head:{1}  Face:{2}", towards, newPoint.ToString(), NowFace));
-    }
-
-
-    private int GetFaceID()
-    {
-        //TODO
-        return 0;
     }
 }
